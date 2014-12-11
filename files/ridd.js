@@ -1,6 +1,5 @@
 // Yoshi2889 - Rank Image Drop Down
-
-window.onload = function()
+function ridd_mod()
 {
 	document.getElementById('star_image_input').onchange = function()
 	{
@@ -19,4 +18,15 @@ window.onload = function()
 		// Update the star preview.
 		document.getElementById('star_preview').src = smf_default_theme_url + '/images/' + ((select_box.value && star_count.value > 0) ? select_box.value : 'blank.gif');
 	}
+}
+
+if (document.addEventListener)
+{
+	// Anything decent.
+	window.addEventListener("load", ridd_mod);
+}
+else if (document.attachEvent)
+{
+	// For IE 8 and other crappy browsers.
+	window.attachEvent("onload", ridd_mod);
 }
