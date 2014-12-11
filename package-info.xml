@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+<!--Generated with Mod Manager (c) 2013 Yoshi2889-->
+<package-info xmlns:smf="http://www.simplemachines.org/" xmlns="http://www.simplemachines.org/xml/package-info">
+    <id>Yoshi2889:RankImageDropDown</id>
+    <name>Rank Image Drop Down</name>
+    <version>1.0</version>
+    <type>modification</type>
+    <install for="2.0 - 2.0.99">
+        <modification>install.xml</modification>
+        <require-file name="files/ridd.js" destination="$themedir/scripts" />
+    </install>
+    <uninstall for="2.0 - 2.0.99">
+        <modification reverse="true">install.xml</modification>
+        <remove-file name="$themedir/scripts/ridd.js" />
+    </uninstall>
+</package-info>

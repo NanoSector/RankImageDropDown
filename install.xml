@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<!--Generated with Mod Manager (c) 2013 Yoshi2889-->
+<modification xmlns:smf="http://www.simplemachines.org/" xmlns="http://www.simplemachines.org/xml/modification">
+    <id>Yoshi2889:RankImageDropDown</id>
+    <version>1.0</version>
+    <file name="$sourcedir/ManageMembergroups.php">
+        <operation>
+            <search position="before"><![CDATA[function EditMembergroup()
+{
+	global $context, $txt, $sourcedir, $modSettings, $smcFunc]]></search>
+            <add><![CDATA[, $settings]]></add>
+        </operation>
+        <operation>
+            <search position="after"><![CDATA[// Finally, get all the groups this could be inherited off.]]></search>
+            <add><![CDATA[	// Get a list of all the image formats we can select.
+	$imageExts = array('png', 'jpg', 'jpeg', 'bmp', 'gif');
+	
+	// Scan the directory.
+	$context['possibleStars'] = array();
+	if ($files = scandir($settings['default_theme_dir'] . '/images'))
+	{
+		// Loop through every file in the directory.
+		foreach ($files as $value)
+		{
+			// Grab the image extension.
+			$ext = pathinfo($settings['default_theme_dir'] . '/images/' . $value, PATHINFO_EXTENSION);
+			
+			// If the extension is not empty, and it is valid, 
+			if (!empty($ext) && in_array($ext, $imageExts))
+			{
+				// Get the size of the image.
+				$image_info = getimagesize($settings['default_theme_dir'] . '/images/' . $value);
+				
+				// If this is bigger than 128 in width or 32 in height, skip this one.
+				if ($image_info == false || $image_info[0] > 128 || $image_info[1] > 32)
+					continue;
+					
+				// Else it's valid. Add it in.
+				else
+					$context['possibleStars'][] = $value;
+			}
+		}
+	}
+	
+	// Insert our JS, if we have possible stars.
+	if (!empty($context['possibleStars']))
+		$context['html_headers'] .= '
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ridd.js"></script>';
+
+]]></add>
+        </operation>
+    </file>
+    <file name="$themedir/ManageMembergroups.template.php">
+        <operation>
+            <search position="replace"><![CDATA[						</dd>
+						<dt>
+							<label for="star_image_input"><strong>', $txt['membergroups_star_image'], ':</strong></label><br />
+							<span class="smalltext">', $txt['membergroups_star_image_note'], '</span>
+						</dt>
+						<dd>
+							', $txt['membergroups_images_url'], '
+							<input type="text" name="star_image" id="star_image_input" value="', $context['group']['star_image'], '" onchange="if (this.value &amp;&amp; this.form.star_count.value == 0) this.form.star_count.value = 1; else if (!this.value) this.form.star_count.value = 0; document.getElementById(\'star_preview\').src = smf_images_url + \'/\' + (this.value &amp;&amp; this.form.star_count.value > 0 ? this.value.replace(/\$language/g, \'', $context['user']['language'], '\') : \'blank.gif\');" size="20" class="input_text" />
+							<img id="star_preview" src="', $settings['images_url'], '/', $context['group']['star_image'] == '' ? 'blank.gif' : $context['group']['star_image'], '" alt="*" />
+						</dd>]]></search>
+            <add><![CDATA[            					</dd>';
+        
+        // Do we have any possible stars to select from?
+       	if (!empty($context['possibleStars']))
+       	{
+       		echo '
+						<dt>
+							<label for="star_image_input"><strong>', $txt['membergroups_star_image'], ':</strong></label><br />
+							<span class="smalltext">', $txt['membergroups_star_image_note'], '</span>
+						</dt>
+						<dd>
+							', $txt['membergroups_images_url'], '
+							<select name="star_image" id="star_image_input">';
+
+		// For every possible star, create an option.
+		foreach ($context['possibleStars'] as $star)
+		{
+			echo '
+								<option value="', $star, '"', $context['group']['star_image'] == $star ? ' selected="selected"' : '', '>', $star, '</option>';
+		}
+	
+		echo '
+							</select>
+							<img id="star_preview" src="', $settings['images_url'], '/', $context['group']['star_image'] == '' ? 'blank.gif' : $context['group']['star_image'], '" alt="*" />
+						</dd>';
+	}
+	
+	// No? Hide the entire control.
+	else
+		echo '
+						<input type="hidden" name="star_image" value="" />';
+						
+	echo ']]></add>
+        </operation>
+    </file>
+</modification>
